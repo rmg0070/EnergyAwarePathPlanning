@@ -1,0 +1,84 @@
+ C:\Users\LibraryUser\Downloads\AOC_IPP_python_v5\AOC_IPP_python_v5\executeIPP.py:114: UserWarning:Adding colorbar to a different Figure <Figure size 640x480 with 2 Axes> than <Figure size 640x480 with 0 Axes> which fig.colorbar is called on.
+ C:\Users\LibraryUser\Downloads\AOC_IPP_python_v5\AOC_IPP_python_v5\utilityFunctions_AOC_IPP.py:147: UserWarning:Adding colorbar to a different Figure <Figure size 640x480 with 2 Axes> than <Figure size 640x480 with 0 Axes> which fig.colorbar is called on.
+ C:\Users\LibraryUser\Downloads\AOC_IPP_python_v5\AOC_IPP_python_v5\utilityFunctions_AOC_IPP.py:147: UserWarning:Adding colorbar to a different Figure <Figure size 800x600 with 2 Axes> than <Figure size 800x600 with 2 Axes> which fig.colorbar is called on.
+1
+iteration:0
+current robots energy[100.  70. 100. 100.]
+[[ 4.  5.  5. -5.]
+ [ 5. -5.  5. -5.]]
+iteration:1
+current robots energy[100.  70. 100. 100.]
+[[-5.  5.  5. -5.]
+ [ 5. -5.  5.  4.]]
+iteration:2
+current robots energy[98.45863139 68.91459564 98.27816225 99.61302387]
+[[ 0.  5.  4. -5.]
+ [ 5.  0.  0. -1.]]
+iteration:3
+current robots energy[96.55863139 68.81459564 98.17816225 97.71302387]
+[[ 1.  5.  2. -1.]
+ [ 2.  3. -5. -5.]]
+iteration:4
+current robots energy[95.45863139 67.71459564 97.05835835 96.61302387]
+[[-5.  3.  4. -2.]
+ [ 1.  3. -3. -2.]]
+iteration:5
+current robots energy[94.72617586 67.01459564 95.88132539 95.38165302]
+[[-4.  4.  5. -4.]
+ [ 3.  4. -3. -3.]]
+iteration:6
+current robots energy[93.40962335 66.51459564 95.21563996 94.64919749]
+[[ 0.  1.  1.  0.]
+ [ 0.  0. -1. -1.]]
+iteration:7
+current robots energy[92.86240976 66.13175293 94.91563996 94.10198389]
+[[-3.  4.  4. -3.]
+ [ 5.  4. -5. -5.]]
+iteration:8
+current robots energy[91.76240976 65.03175293 93.92121277 93.1075567 ]
+[[-4.  4.  5. -3.]
+ [ 3.  4. -4. -4.]]
+iteration:9
+current robots energy[90.49621938 63.93175293 92.82121277 92.0075567 ]
+[[-4.  4.  4. -4.]
+ [ 3.  4. -4. -5.]]
+iteration:10
+current robots energy[89.94900578 63.83175293 92.43837006 91.7075567 ]
+[[-4.  4.  0. -4.]
+ [ 3.  4. -1. -5.]]
+iteration:11
+current robots energy[89.84900578 63.73175293 92.13837006 91.32471399]
+[[-4.  4. -3. -4.]
+ [ 3.  4. -1. -5.]]
+iteration:12
+current robots energy[89.74900578 63.63175293 91.03837006 91.22471399]
+[[-4.  4. -2. -4.]
+ [ 3.  4. -1. -5.]]
+iteration:13
+current robots energy[89.64900578 63.53175293 90.33837006 91.12471399]
+[[-4.  4. -2. -4.]
+ [ 3.  4. -1. -5.]]
+iteration:14
+current robots energy[89.54900578 63.43175293 90.03837006 91.02471399]
+[[-4.  4. -2. -4.]
+ [ 3.  4. -1. -5.]]
+iteration:15
+current robots energy[89.44900578 63.33175293 89.93837006 90.92471399]
+[[-4.  4. -2. -4.]
+ [ 3.  4. -1. -5.]]
+iteration:16
+current robots energy[89.34900578 63.23175293 89.83837006 90.82471399]
+[[-4.  4. -2. -4.]
+ [ 3.  4. -1. -5.]]
+iteration:17
+current robots energy[89.24900578 63.13175293 89.73837006 90.72471399]
+[[-4.  4. -2. -4.]
+ [ 3.  4. -1. -5.]]
+iteration:18
+current robots energy[89.14900578 63.03175293 89.63837006 90.62471399]
+[[-4.  4. -2. -4.]
+ [ 3.  4. -1. -5.]]
+iteration:19
+current robots energy[89.04900578 62.93175293 89.53837006 90.52471399]
+[[-4.  4. -2. -4.]
+ [ 3.  4. -1. -5.]]
