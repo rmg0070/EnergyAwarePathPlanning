@@ -82,9 +82,10 @@ def executeIPP_py(scenario_number,N=6,resolution=0.1, number_of_iterations=20, s
     # Variances for all distributions
     variances = np.ones(num_distributions) * 2.0 # Adjusted variance for visibility
     # Generate random means for both density functions
-    # means_phi = generate_random_means(num_distributions, (x_min,x_max))
-    means_phi =  np.load("C:\\Users\\LibraryUser\\Desktop\\Proposed_Approach\\AOC_IPP_python_v5\\means_phi.npy")
-    Z_phi = np.load("C:\\Users\\LibraryUser\\Desktop\\Proposed_Approach\\AOC_IPP_python_v5\\Z_phi.npy")
+    means_phi = generate_random_means(num_distributions, (x_min,x_max))
+    np.save("C:\\Users\\LibraryUser\\Desktop\\EnergyAwarePathPlanning\\"+"means_phi.npy",means_phi)
+    # means_phi =  np.load("C:\\Users\\LibraryUser\\Desktop\\Proposed_Approach\\AOC_IPP_python_v5\\means_phi.npy")
+    # Z_phi = np.load("C:\\Users\\LibraryUser\\Desktop\\Proposed_Approach\\AOC_IPP_python_v5\\Z_phi.npy")
 
 
     means_min = np.min(means_phi)
@@ -103,8 +104,8 @@ def executeIPP_py(scenario_number,N=6,resolution=0.1, number_of_iterations=20, s
             # print(x,y,i,j)
             X[i, j] = x
             Y[i, j] = y
-    # Z_phi = np.vectorize(lambda x, y: density_function(x, y, means_phi, variances))(X, Y)
-  
+    Z_phi = np.vectorize(lambda x, y: density_function(x, y, means_phi, variances))(X, Y)
+    np.save("C:\\Users\\LibraryUser\\Desktop\\EnergyAwarePathPlanning\\"+"Z_phi.npy",Z_phi)
 
     print(f"max value in pred_mean:{np.max(Z_phi)} and min value {np.min(Z_phi)}")
     test_X = np.column_stack((X.flatten(),Y.flatten()))
@@ -273,7 +274,7 @@ def executeIPP_py(scenario_number,N=6,resolution=0.1, number_of_iterations=20, s
         rmse = np.sqrt(np.mean(np.square(Z_phi.flatten() - pred_mean.flatten())))
         rmse_array[iteration] = rmse
 
-        variance_metric = np.max(pred_var.flatten())
+        variance_metric = np.mean(pred_var.flatten())
         variance_array[iteration] = variance_metric
         positions_last_timeStep = copy.deepcopy(current_robotspositions)
         # Currently the next positions of robots are calculated using sampling goal only - 

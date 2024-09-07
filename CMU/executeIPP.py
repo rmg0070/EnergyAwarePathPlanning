@@ -263,7 +263,7 @@ def executeIPP_py(scenario_number,N=6,resolution=0.1, number_of_iterations=20, s
         rmse = np.sqrt(np.mean(np.square(Z_phi.flatten() - pred_mean.flatten())))
         rmse_array[iteration] = rmse
 
-        variance_metric = np.max(pred_var.flatten())
+        variance_metric = np.mean(pred_var.flatten())
         variance_array[iteration] = variance_metric
         positions_last_timeStep = copy.deepcopy(current_robotspositions)
         # Currently the next positions of robots are calculated using sampling goal only - 

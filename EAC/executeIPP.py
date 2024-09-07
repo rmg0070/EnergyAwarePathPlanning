@@ -99,9 +99,9 @@ def executeIPP_py(scenario_number,N=6,resolution=0.1, number_of_iterations=20, s
     variances = np.ones(num_distributions) * 2.0 # Adjusted variance for visibility
     # Generate random means for both density functions
     # means_phi = generate_random_means(num_distributions, (x_min,x_max))
-
-    means_phi =  np.load("C:\\Users\\LibraryUser\\Desktop\\Proposed_Approach\\AOC_IPP_python_v5\\means_phi.npy")
-    Z_phi = np.load("C:\\Users\\LibraryUser\\Desktop\\Proposed_Approach\\AOC_IPP_python_v5\\Z_phi.npy")
+    # C:\Users\LibraryUser\Desktop\EnergyAwarePathPlanning\means_phi.npy
+    means_phi =  np.load("C:\\Users\\LibraryUser\\Desktop\\EnergyAwarePathPlanning\\means_phi.npy")
+    Z_phi = np.load("C:\\Users\\LibraryUser\\Desktop\\EnergyAwarePathPlanning\\Z_phi.npy")
 
     means_min = np.min(means_phi)
     means_max = np.max(means_phi)

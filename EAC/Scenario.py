@@ -9,7 +9,7 @@ def get_scenario_params(scenario_name, N):
     robot_beta = np.array([0.5,0.5,0.5,0.5])
     robot_alpha = np.array([0.1,0.1,0.1,0.1])
     exp_name = "temp"
-    exp_trail = "1"
+    exp_trail = "2"
     # Adjust parameters based on scenario
     if scenario_name == '1':
         print(scenario_name)
