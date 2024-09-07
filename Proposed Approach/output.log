@@ -1,0 +1,78 @@
+C:\Users\LibraryUser\Downloads\AOC_IPP_python_v5\AOC_IPP_python_v5\executeIPP.py:102: UserWarning: Adding colorbar to a different Figure <Figure size 640x480 with 2 Axes> than <Figure size 640x480 with 0 Axes> which fig.colorbar is called on.
+  plt.colorbar(contour_plot_mean, ax= main_axes)
+C:\Users\LibraryUser\Downloads\AOC_IPP_python_v5\AOC_IPP_python_v5\utilityFunctions_AOC_IPP.py:147: UserWarning: Adding colorbar to a different Figure <Figure size 640x480 with 2 Axes> than <Figure size 640x480 with 0 Axes> which fig.colorbar is called on.
+  plt.colorbar(contour_plot_mean, ax= ax_2d_mean)
+C:\Users\LibraryUser\Downloads\AOC_IPP_python_v5\AOC_IPP_python_v5\utilityFunctions_AOC_IPP.py:147: UserWarning: Adding colorbar to a different Figure <Figure size 800x600 with 2 Axes> than <Figure size 800x600 with 2 Axes> which fig.colorbar is called on.
+  plt.colorbar(contour_plot_mean, ax= ax_2d_mean)
+1
+max value in pred_mean:7.798963139445067 and min value 0.01351676779546148
+(121, 2)
+4.2613502259032146
+(121, 4)
+shape of mean(121, 1)
+shape of var(121,)
+shape of mean(121, 1)
+shape of var(121,)
+shape of mean(121, 1)
+shape of var(121,)
+shape of mean(121, 1)
+shape of var(121,)
+iteration:0
+(121, 4)
+shape of mean(121, 1)
+shape of var(121,)
+shape of mean(121, 1)
+shape of var(121,)
+shape of mean(121, 1)
+shape of var(121,)
+shape of mean(121, 1)
+shape of var(121,)
+beta for 0 is 0.7487636884216826
+alpha for 0 is 0.2512363115783174
+found index:0[0, 4]
+beta for 1 is 0.6587872380968218
+alpha for 1 is 0.3412127619031782
+found index:1[0, 0]
+beta for 2 is 0.7487636884216826
+alpha for 2 is 0.2512363115783174
+found index:2[0, 0]
+beta for 3 is 0.7487636884216826
+alpha for 3 is 0.2512363115783174
+found index:3[0, 0]
+[[-5. -5.  2.  1.]
+ [-1. -5. -2. -5.]]
+iteration:1
+(121, 4)
+shape of mean(121,)
+shape of var(121,)
+shape of mean(121,)
+shape of var(121,)
+shape of mean(121,)
+shape of var(121,)
+shape of mean(121,)
+shape of var(121,)
+beta for 0 is 0.7487636884216826
+alpha for 0 is 0.2512363115783174
+found index:0[0, 2]
+beta for 1 is 0.6587872380968218
+alpha for 1 is 0.3412127619031782
+found index:1[0, 0]
+beta for 2 is 0.7487636884216826
+alpha for 2 is 0.2512363115783174
+found index:2[0, 0]
+beta for 3 is 0.7487636884216826
+alpha for 3 is 0.2512363115783174
+found index:3[0, 0]
+[[-5. -5. -1. -2.]
+ [-3. -5. -2. -5.]]
+iteration:2
+Traceback (most recent call last):
+  File "C:\Users\LibraryUser\Downloads\AOC_IPP_python_v5\AOC_IPP_python_v5\executeIPP.py", line 443, in <module>
+    executeIPP_py(scenario_number,N ,resolution=1.0,number_of_iterations=10)     
+    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\LibraryUser\Downloads\AOC_IPP_python_v5\AOC_IPP_python_v5\executeIPP.py", line 167, in executeIPP_py
+    model.AddSample(train_X,train_Y)
+  File "C:\Users\LibraryUser\Downloads\AOC_IPP_python_v5\AOC_IPP_python_v5\Gp_mixture.py", line 63, in AddSample
+    self.Y_train = np.concatenate((self.Y_train, Y_train)).reshape(-1)
+                   ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+ValueError: all the input arrays must have same number of dimensions, but the array at index 0 has 1 dimension(s) and the array at index 1 has 2 dimension(s)
