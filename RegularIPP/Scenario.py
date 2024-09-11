@@ -5,9 +5,9 @@ def get_scenario_params(scenario_name, N):
     weights = np.ones(N)
     initial_energy = np.full(N, 100.0)
     # initial_energy[1] = 70
-    initial_energy[1] = 70
-    initial_energy[2] = 70
-    robot_beta = np.array([0.45,0.45,0.45,0.45])
+    initial_energy[1] = 60
+    initial_energy[3] = 60
+    robot_beta = np.array([0.5,0.5,0.5,0.5])
     robot_alpha = np.array([0.1,0.1,0.1,0.1])
     exp_name = "temp"
     exp_trail = "1"

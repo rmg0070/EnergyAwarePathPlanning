@@ -24,7 +24,7 @@ class GP:
             self.Y_train = np.concatenate((self.Y_train, Y_train), axis=0)   
         
         # Create a GP regression model
-        self.model = GPy.models.GPRegression(self.X_train, self.Y_train,kernel=self.kernel)
+        self.model = GPy.models.GPRegression(self.X_train, self.Y_train)
         
         # Optimize the model parameters
         self.model.optimize()  # Turn off messages for brevity

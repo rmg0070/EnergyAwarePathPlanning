@@ -32,9 +32,9 @@ def executeIPP_py(scenario_number,N=6,resolution=0.1, number_of_iterations=20, s
     # file_path = f"{exp_name}\\{exp_trail}"
     # generate random initial values
     # current_robotspositions =  np.random.uniform(x_min, x_max, size=(2, N))
-    # current_robotspositions = np.array([[-0.71973804, -4.85164722, -2.85176015,  1.99403118],[ 3.11841394, -4.55468264, -1.32746517,  4.42244048]])
+    current_robotspositions = np.array([[-0.71973804, -4.85164722, -2.85176015,  1.99403118],[ 3.11841394, -4.55468264, -1.32746517,  4.42244048]])
     # current_robotspositions = np.array([[1, -1, 4, -4], [3, -3, 2, -2]])
-    current_robotspositions = np.array([[-10, 10, -10, 10], [-10, -10 , 10, 10]])
+    # current_robotspositions = np.array([[-10, 10, -10, 10], [-10, -10 , 10, 10]])
 
 
 
@@ -182,14 +182,16 @@ def executeIPP_py(scenario_number,N=6,resolution=0.1, number_of_iterations=20, s
         # before plotting on top of
         if(iteration>0):
             for robot_r in range(len(global_hull_figHandles)):
-                current_position_marker_handle[robot_r].remove()
+                # current_position_marker_handle[robot_r].remove()
                 hullObject = global_hull_figHandles[robot_r]
                 hullObject.remove()
+            for robot_r in range(N):
+                current_position_marker_handle[robot_r].remove()
                 
         current_position_marker_handle = [main_axes.scatter(current_robotspositions[0,:], current_robotspositions[1,:], edgecolors="red", facecolors='none', s=100, marker="o", linewidths=3) for i in range(N)]
         # main_axes.set_xlim([-1.2,1.2])
         # main_axes.set_ylim([-1.2,1.2])
-        C_x, C_y , cost, area, global_hull_figHandles, global_hull_textHandles,locationIdx,locationx = partitionFinder(main_axes,np.transpose(current_robotspositions[:2,:N]), [x_min,x_max], [y_min,y_max], resolution, pred_mean.reshape(Z_phi.shape),updated_weights) 
+        C_x, C_y , cost, area, global_hull_figHandles, global_hull_textHandles,locationIdx,locationx = partitionFinder(None,np.transpose(current_robotspositions[:2,:N]), [x_min,x_max], [y_min,y_max], resolution, pred_mean.reshape(Z_phi.shape),updated_weights) 
         train_X = np.transpose(current_robotspositions)
         Z_phi_current_pos = np.vectorize(lambda x, y: density_function(x, y, means_phi, variances))(current_robotspositions[0,:], current_robotspositions[1,:])
         # Beta for Eq 9 - surrogate_mean from [1]

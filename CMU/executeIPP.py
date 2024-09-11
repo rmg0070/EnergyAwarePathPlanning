@@ -33,11 +33,11 @@ def executeIPP_py(scenario_number,N=6,resolution=0.1, number_of_iterations=20, s
     # current_robotspositions =  np.random.uniform(x_min, x_max, size=(2, N))
     # current_robotspositions = np.array([[5, -5, 0, 0], [5, 5, -5, -5]])
     # current_robotspositions = np.array([[1, -1, 4, -4], [3, -3, 2, -2]])
-    # current_robotspositions = np.array([[-0.71973804, -4.85164722, -2.85176015,  1.99403118],
-    #       [ 3.11841394, -4.55468264, -1.32746517,  4.42244048]])
+    current_robotspositions = np.array([[-0.71973804, -4.85164722, -2.85176015,  1.99403118],
+          [ 3.11841394, -4.55468264, -1.32746517,  4.42244048]])
 
     # current_robotspositions =np.array([[2, -2, 5, -5], [-4, 4, -2, 2]])
-    current_robotspositions = np.array([[-10, 10, -10, 10], [-10, -10 , 10, 10]])
+    # current_robotspositions = np.array([[-10, 10, -10, 10], [-10, -10 , 10, 10]])
 
 
 
@@ -98,8 +98,8 @@ def executeIPP_py(scenario_number,N=6,resolution=0.1, number_of_iterations=20, s
     variances = np.ones(num_distributions) * 2.0 # Adjusted variance for visibility
     # Generate random means for both density functions
     # means_phi = generate_random_means(num_distributions, (x_min,x_max))
-    means_phi =  np.load("C:\\Users\\LibraryUser\\Desktop\\Proposed_Approach\\AOC_IPP_python_v5\\means_phi.npy")
-    Z_phi = np.load("C:\\Users\\LibraryUser\\Desktop\\Proposed_Approach\\AOC_IPP_python_v5\\Z_phi.npy")
+    means_phi =  np.load("C:\\Users\\LibraryUser\\Desktop\\EnergyAwarePathPlanning\\means_phi.npy")
+    Z_phi = np.load("C:\\Users\\LibraryUser\\Desktop\\EnergyAwarePathPlanning\\Z_phi.npy")
     means_min = np.min(means_phi)
     means_max = np.max(means_phi)
     max_var =  5.0

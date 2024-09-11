@@ -47,16 +47,17 @@ def partitionFinder(ax, robotsPositions, envSize_X, envSize_Y, resolution, densi
     # Therefore, using convex hull to draw the boundary of each partition
     # It requires deleting previous boundaries and plotting new ones at every iteration
     # Need this object handles so we can remove previous boundaries before calling the partitionFinder function from main file
-    for r in range(robotsPositions.shape[0]):
-        robotsLocation = np.array(locations[r])
-        if len(robotsLocation)!=0:
-            hull = ConvexHull(robotsLocation)
-            # Get the vertices of the convex hull
-            boundary_points = robotsLocation[hull.vertices]
-            # Extract x and y coordinates
-            x, y = boundary_points[:, 0], boundary_points[:, 1]
-            hullHandle, =  ( ax.plot(x, y, marker='None', linestyle='-', color="black", markersize=6, linewidth =4))
-            hull_figHandles.append(hullHandle)
+    if ax !=None:
+        for r in range(robotsPositions.shape[0]):
+            robotsLocation = np.array(locations[r])
+            if len(robotsLocation)!=0:
+                hull = ConvexHull(robotsLocation)
+                # Get the vertices of the convex hull
+                boundary_points = robotsLocation[hull.vertices]
+                # Extract x and y coordinates
+                x, y = boundary_points[:, 0], boundary_points[:, 1]
+                hullHandle, =  ( ax.plot(x, y, marker='None', linestyle='-', color="black", markersize=6, linewidth =4))
+                hull_figHandles.append(hullHandle)
         
     # for centroid calculation
     # centroid calculation can be done using lower resolution
