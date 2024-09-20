@@ -13,30 +13,25 @@ sys.path.append('C:\\Users\\LibraryUser\\Downloads\\AOC_IPP_python_v5\\AOC_IPP_p
 from Gp_mixture import MixtureGaussianProcess
 
 
-# model = MixtureGaussianProcess(4,[GP(sigma_f=np.var(Z_phi)) for i in range(4)],[GP(sigma_f=np.var(Z_phi)) for i in range(4)])
-##################################################################################
-#Paper ref:
-#[1] Maria Santos, Udari Madhushani, Alessia Benevento, and Naomi Ehrich Leonard. Multi-robot learning and coverage of unknown spatial fields. 
-#In 2021 International Symposium on Multi-Robot and Multi-Agent Systems (MRS), pages 137–145. IEEE, 2021.
-##################################################################################
 
 def executeIPP_py(scenario_number,N=6,resolution=0.1, number_of_iterations=20, save_fig_flag=True,):
     distance_to_centroid_threshold= -0.1
     file_path = ""
     ROBOT_COLOR = {0: "red", 1: "green", 2: "blue", 3:"black",4:"grey",5:"orange"}
-    x_min, x_max = -10, 10
-    y_min, y_max = -10, 10    
+    x_min, x_max = 0.0, 40.0
+    y_min, y_max = 0.0, 40.0   
 
     robot_alpha,robot_beta,initial_robots_energy,exp_name,exp_trail = get_scenario_params(scenario_number,N)
     file_path = f"{exp_name}\\{exp_trail}"
     # generate random initial values
     current_robotspositions =  np.random.uniform(x_min, x_max, size=(2, N))
     Model = "MiGp"
-
-    current_robotspositions = np.array([[-0.71973804, -4.85164722, -2.85176015,  1.99403118],
-        [ 3.11841394, -4.55468264, -1.32746517,  4.42244048]])
-    # current_robotspositions =np.array([[2, -2, 5, -5], [-4, 4, -2, 2]])
-    # current_robotspositions = np.array([[1, -1, 4, -4], [3, -3, 2, -2]])
+    # current_robotspositions = np.array([
+    #     [19.71047901, 3.34092571],
+    #     [14.71047901, 14.34092571],
+    #     [2.33815788, 3.87953727],
+    #     [5, 12]
+    # ]).T
  
 
     # to show interactive plotting
@@ -80,12 +75,14 @@ def executeIPP_py(scenario_number,N=6,resolution=0.1, number_of_iterations=20, s
     # Number of Gaussian distributions
     num_distributions = 9
     # Variances for all distributions
-    variances = np.ones(num_distributions) * 2.0 # Adjusted variance for visibility
+    # variances = np.load("C:\\Users\\LibraryUser\\Desktop\\EnergyAwarePathPlanning\\variances.npy")
+    variances = np.ones(num_distributions) * 10.0 # Adjusted variance for visibility
+
     # Generate random means for both density functions
     means_phi = generate_random_means(num_distributions, (x_min,x_max))
-    np.save("C:\\Users\\LibraryUser\\Desktop\\EnergyAwarePathPlanning\\"+"means_phi.npy",means_phi)
-    # means_phi =  np.load("C:\\Users\\LibraryUser\\Desktop\\Proposed_Approach\\AOC_IPP_python_v5\\means_phi.npy")
-    # Z_phi = np.load("C:\\Users\\LibraryUser\\Desktop\\Proposed_Approach\\AOC_IPP_python_v5\\Z_phi.npy")
+    # np.save("C:\\Users\\LibraryUser\\Desktop\\EnergyAwarePathPlanning\\"+"means_phi.npy",means_phi)
+    # means_phi =  np.load("C:\\Users\\LibraryUser\\Desktop\\EnergyAwarePathPlanning\\means_phi.npy")
+    # Z_phi = np.load("C:\\Users\\LibraryUser\\Desktop\\EnergyAwarePathPlanning\\Z_phi.npy")
 
 
     means_min = np.min(means_phi)
@@ -105,8 +102,8 @@ def executeIPP_py(scenario_number,N=6,resolution=0.1, number_of_iterations=20, s
             X[i, j] = x
             Y[i, j] = y
     Z_phi = np.vectorize(lambda x, y: density_function(x, y, means_phi, variances))(X, Y)
-    np.save("C:\\Users\\LibraryUser\\Desktop\\EnergyAwarePathPlanning\\"+"Z_phi.npy",Z_phi)
-
+    # np.save("C:\\Users\\LibraryUser\\Desktop\\EnergyAwarePathPlanning\\"+"Z_phi.npy",Z_phi)
+    print(Z_phi.shape)
     print(f"max value in pred_mean:{np.max(Z_phi)} and min value {np.min(Z_phi)}")
     test_X = np.column_stack((X.flatten(),Y.flatten()))
     # print(test_X.shape)
@@ -122,7 +119,7 @@ def executeIPP_py(scenario_number,N=6,resolution=0.1, number_of_iterations=20, s
     contour_plot_mean = main_axes.contourf(X, Y, Z_phi.reshape(X.shape[0],X.shape[1]), cmap='viridis')
     plt.colorbar(contour_plot_mean, ax= main_axes)
     train_X = np.transpose(current_robotspositions)
-    Z_phi_current_pos = np.vectorize(lambda x, y: density_function(x, y, means_phi, variances))(current_robotspositions[0,:], current_robotspositions[1,:])
+    Z_phi_current_pos = np.vectorize(lambda x, y: density_function(x, y, means_phi, variances))(current_robotspositions[0,:], current_robotspositions[1,:]) + np.random.uniform(-2,2,size=N)
     train_Y = Z_phi_current_pos.reshape(train_X.shape[0],1)
     # /\print(np.var(Z_phi))
     # model = GP(sigma_f=np.var(Z_phi))
@@ -186,11 +183,11 @@ def executeIPP_py(scenario_number,N=6,resolution=0.1, number_of_iterations=20, s
         current_position_marker_handle = [main_axes.scatter(current_robotspositions[0,:], current_robotspositions[1,:], edgecolors="red", facecolors='none', s=100, marker="o", linewidths=3) for i in range(N)]
         # main_axes.set_xlim([-1.2,1.2])
         C_x, C_y , cost, area, global_hull_figHandles, global_hull_textHandles,locationIdx,locationx = partitionFinder(main_axes,np.transpose(current_robotspositions[:2,:N]), [x_min,x_max], [y_min,y_max], resolution, pred_mean.reshape(Z_phi.shape)) 
-        # main_axes.set_ylim([-1.2,1.2])
+        # main_axes.set_ylim([-1.2,1.2])e
         # 
         # C_x, C_y , cost, area, global_hull_figHandles, global_hull_textHandles,locationIdx,locationx = partitionFinder(main_axes,np.transpose(current_robotspositions[:2,:N]), [x_min,x_max], [y_min,y_max], resolution,surrogate_mean) 
         train_X = np.transpose(current_robotspositions)
-        Z_phi_current_pos = np.vectorize(lambda x, y: density_function(x, y, means_phi, variances))(current_robotspositions[0,:], current_robotspositions[1,:])
+        Z_phi_current_pos = np.vectorize(lambda x, y: density_function(x, y, means_phi, variances))(current_robotspositions[0,:], current_robotspositions[1,:]) + np.random.uniform(-2,2,size=N)
         # Beta for Eq 9 - surrogate_mean from [1]
         beta_val = 2*math.log( discretization/(6*0.7))
         beta_val_array[iteration] = beta_val
@@ -210,8 +207,10 @@ def executeIPP_py(scenario_number,N=6,resolution=0.1, number_of_iterations=20, s
                 model.train(train_X,train_Y)
                 pred_mean, pred_var = model.predict(test_X)
         pred_var = pred_var.reshape(X.shape[0],X.shape[1])
+        print(f"shape of trainx {train_X.shape},trainY {train_Y.shape}")
+        print(f"pred var{pred_var}")
         pred_std = np.sqrt(pred_var)
-        plot_mean_and_var(X,Y,means_min,means_max,pred_mean,pred_std.reshape(pred_mean.shape),pred_mean_fig=pred_mean_fig,pred_var_fig=pred_var_fig)
+        plot_mean_and_var(X,Y,pred_mean,pred_std.reshape(pred_mean.shape),Z_phi,pred_mean_fig=pred_mean_fig,pred_var_fig=pred_var_fig)
         # Eq 9 from paper [1]
         # phi^(t)(q) = mu^(t-1)(q) - sqrt(beta^(t)) * sigma^(t-1)(q), for all q in D
         surrogate_mean = copy.deepcopy(pred_mean) - (math.sqrt(beta_val)*pred_std.reshape(pred_mean.shape))
@@ -220,7 +219,7 @@ def executeIPP_py(scenario_number,N=6,resolution=0.1, number_of_iterations=20, s
             location_ids = np.array(locationIdx[robot])
             locations = np.array(locationx[robot])
             if len(location_ids) != 0:
-                std_in_voronoi_region = (pred_std[location_ids[:, 0], location_ids[:, 1]])
+                std_in_voronoi_region = (pred_var[location_ids[:, 0], location_ids[:, 1]])
                 idx_with_max_std = np.argmax(std_in_voronoi_region)        
                 if robot==0:
                     sampling_goal[:,robot] = locations[idx_with_max_std] 
@@ -452,7 +451,7 @@ def executeIPP_py(scenario_number,N=6,resolution=0.1, number_of_iterations=20, s
             pred_var_fig.savefig(file_path+"\\GPvar.png")
             fig_var.savefig(file_path+"\\variance.png")
         plt.show()
-        plt.pause(10)
+        plt.pause(1)
       
     return 
 
@@ -460,5 +459,5 @@ def executeIPP_py(scenario_number,N=6,resolution=0.1, number_of_iterations=20, s
 if __name__=="__main__":
     N = 4
     scenario_number = '1'
-    executeIPP_py(scenario_number,N ,resolution=1.0,number_of_iterations=50)     
+    executeIPP_py(scenario_number,N ,resolution=1.0,number_of_iterations=100)     
 

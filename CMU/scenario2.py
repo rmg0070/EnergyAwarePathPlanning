@@ -12,7 +12,6 @@ sys.path.append('C:\\Users\\LibraryUser\\Downloads\\AOC_IPP_python_v5\\AOC_IPP_p
 from Gp_mixture import MixtureGaussianProcess
 
 
-
 def executeIPP_py(scenario_number,N=6,resolution=0.1, number_of_iterations=20, save_fig_flag=True,):
     distance_to_centroid_threshold= -0.1
     file_path = ""
@@ -24,24 +23,13 @@ def executeIPP_py(scenario_number,N=6,resolution=0.1, number_of_iterations=20, s
 
     robot_alpha,robot_beta,initial_robots_energy,exp_name,exp_trail = get_scenario_params(scenario_number,N)
     # file_path = f"{exp_name}\\{exp_trail}"
-    # generate random initial values
-    # current_robotspositions =  np.random.uniform(x_min, x_max, size=(2, N))
-    # current_robotspositions = np.array([[5, -5, 0, 0], [5, 5, -5, -5]])
-    # current_robotspositions = np.array([[1, -1, 4, -4], [3, -3, 2, -2]])
-    # current_robotspositions = np.array([[-0.71973804, -4.85164722, -2.85176015,  1.99403118],
-    #       [ 3.11841394, -4.55468264, -1.32746517,  4.42244048]])
     current_robotspositions = np.array([
         [19.71047901, 3.34092571],
         [14.71047901, 14.34092571],
         [2.33815788, 3.87953727],
         [5, 12]
     ]).T
-    # current_robotspositions =np.array([[2, -2, 5, -5], [-4, 4, -2, 2]])
-    # current_robotspositions = np.array([[-10, 10, -10, 10], [-10, -10 , 10, 10]])
 
-
-
-    # current_robotspositions = np.array([[-4,5,-5,5 ],[-5,-4,5,5]])
     weights = [1.0,1.0,1.0,1.0]
     updated_weights_temp =[1.0,1.0,1.0,1.0]
     updated_weights = np.array(weights)
@@ -67,6 +55,7 @@ def executeIPP_py(scenario_number,N=6,resolution=0.1, number_of_iterations=20, s
     weights_plot =  np.zeros((number_of_iterations,N))
     updated_weights_plot = np.zeros((number_of_iterations,N))
     updated_weights_plot[0,:] = updated_weights
+    alive_robots = []
     
     
     
@@ -88,11 +77,6 @@ def executeIPP_py(scenario_number,N=6,resolution=0.1, number_of_iterations=20, s
     coeff_recharge = np.zeros((number_of_iterations,N))
     coeff_mean = np.zeros((number_of_iterations,N))
     coeff_var = np.zeros((number_of_iterations,N))
-
-
-    # generate 9 Gauusian distribution for ground_truth
-    # Using Z_phi here to represent ground_truth (phi(q))
-    # Number of Gaussian distributions
     num_distributions = 9
     # Variances for all distributions
     variances = np.load("C:\\Users\\LibraryUser\\Desktop\\EnergyAwarePathPlanning\\variances.npy")
@@ -102,12 +86,6 @@ def executeIPP_py(scenario_number,N=6,resolution=0.1, number_of_iterations=20, s
     # means_phi = generate_random_means(num_distributions, (x_min,x_max))
     means_phi =  np.load("C:\\Users\\LibraryUser\\Desktop\\EnergyAwarePathPlanning\\means_phi.npy")
     Z_phi = np.load("C:\\Users\\LibraryUser\\Desktop\\EnergyAwarePathPlanning\\Z_phi.npy")
-    means_min = np.min(means_phi)
-    means_max = np.max(means_phi)
-    max_var =  5.0
-    min_var = 0.0
-
-
     # Create a grid of points for plotting
     resolution=1.0
     x_min, x_max = 0, 20 
@@ -123,19 +101,17 @@ def executeIPP_py(scenario_number,N=6,resolution=0.1, number_of_iterations=20, s
             X[i, j] = x
             Y[i, j] = y
     test_X = np.column_stack((X.flatten(),Y.flatten()))
-    # plot the density to main fig to get an idea of where robots are going
-    # can comment this line to turn off
-    # main_axes.pcolor(X, Y, Z_phi,shading="auto")
+
     points_grid_values = np.ones((int(X.shape[0]),int(X.shape[1])))
     contour_plot_mean = main_axes.contourf(X, Y, Z_phi.reshape(X.shape[0],X.shape[1]), cmap='viridis')
     plt.colorbar(contour_plot_mean, ax= main_axes)
     train_X = np.transpose(current_robotspositions)
     Z_phi_current_pos = np.vectorize(lambda x, y: density_function(x, y, means_phi, variances))(current_robotspositions[0,:], current_robotspositions[1,:])+ np.random.uniform(-2,2,size=N)
     train_Y = Z_phi_current_pos.reshape(train_X.shape[0],1)
-    # train_Y = Z_phi_current_pos.reshape(-1)
 
     if Model == "MixGp":
         model = MixtureGaussianProcess(4,[GP(sigma_f=np.var(Z_phi)) for i in range(4)],[GP(sigma_f=np.var(Z_phi)) for i in range(4)])
+        train_Y = train_Y.reshape(-1)
         model.AddSample(train_X,train_Y)
         pred_mean, pred_var = model.Predict(test_X)
     else:
@@ -155,6 +131,21 @@ def executeIPP_py(scenario_number,N=6,resolution=0.1, number_of_iterations=20, s
     energy_percentage = (current_robot_energy / max_energy)
     updated_weights = energy_percentage
     for iteration in range(number_of_iterations):
+        alive_robots = []
+        max_energy = 100
+        energy_percentage = (current_robot_energy / max_energy)
+
+        new_robot_Positions_x = []
+        new_robot_Positions_y = []
+        for robot in range(N):
+            if energy_percentage[robot]>0:
+                alive_robots.append(robot) 
+                new_robot_Positions_x.append(current_robotspositions[0][robot])
+                new_robot_Positions_y.append(current_robotspositions[1][robot])
+        current_robotspositions_mod =  np.column_stack((new_robot_Positions_x, new_robot_Positions_y))
+
+        if len(alive_robots) == 0:
+            break
         positions_array[iteration,:,:] = current_robotspositions[:2,:]
         [main_axes.scatter(current_robotspositions[0, i], current_robotspositions[1, i], c=ROBOT_COLOR[(i) % len(ROBOT_COLOR)], s=60, marker="x", linewidths=1) for i in range(N)]
 
@@ -175,17 +166,26 @@ def executeIPP_py(scenario_number,N=6,resolution=0.1, number_of_iterations=20, s
                 current_position_marker_handle[robot_r].remove()
                 hullObject = global_hull_figHandles[robot_r]
                 hullObject.remove()
-            for robot_r in range(N):
+            for robot_r in range(len(alive_robots)):
                 current_position_marker_handle[robot_r].remove()
 
-                
-        current_position_marker_handle = [main_axes.scatter(current_robotspositions[0,:], current_robotspositions[1,:], edgecolors="red", facecolors='none', s=100, marker="o", linewidths=3) for i in range(N)]
-        # main_axes.set_xlim([-1.2,1.2])
-        # main_axes.set_ylim([-1.2,1.2])
+        alive_positions = current_robotspositions[:, alive_robots]
+        current_position_marker_handle = [
+        main_axes.scatter(
+            alive_positions[0, i], 
+            alive_positions[1, i], 
+            edgecolors="red", 
+            facecolors='none', 
+            s=100, 
+            marker="o", 
+            linewidths=3
+        ) for i in range(alive_positions.shape[1])]  
+        # current_position_marker_handle = [main_axes.scatter(current_robotspositions[0,:], current_robotspositions[1,:], edgecolors="red", facecolors='none', s=100, marker="o", linewidths=3) for i in range(N)]
+
         updated_weights = energy_percentage
         updated_weights_plot[iteration,:] = updated_weights 
         
-        C_x, C_y , cost, area, global_hull_figHandles, global_hull_textHandles,locationIdx,locationx = partitionFinder(None,np.transpose(current_robotspositions[:2,:N]), [x_min,x_max], [y_min,y_max], resolution, pred_mean.reshape(Z_phi.shape),updated_weights) 
+        C_x, C_y , cost, area, global_hull_figHandles, global_hull_textHandles,locationIdx,locationx = partitionFinder(None,current_robotspositions_mod, [x_min,x_max], [y_min,y_max], resolution, pred_mean.reshape(Z_phi.shape),updated_weights) 
         train_X = np.transpose(current_robotspositions)
         Z_phi_current_pos = np.vectorize(lambda x, y: density_function(x, y, means_phi, variances))(current_robotspositions[0,:], current_robotspositions[1,:])+ np.random.uniform(-2,2,size=N)
         # Beta for Eq 9 - surrogate_mean from [1]
@@ -204,18 +204,16 @@ def executeIPP_py(scenario_number,N=6,resolution=0.1, number_of_iterations=20, s
         pred_std = np.sqrt(pred_var)
 
         plot_mean_and_var(X,Y,pred_mean,pred_std.reshape(pred_mean.shape),Z_phi,pred_mean_fig=pred_mean_fig,pred_var_fig=pred_var_fig)
-        # Eq 9 from paper [1]
-        # phi^(t)(q) = mu^(t-1)(q) - sqrt(beta^(t)) * sigma^(t-1)(q), for all q in D
-        # surrogate_mean = copy.deepcopy(pred_mean) + (math.sqrt(beta_val)*pred_std.reshape(pred_mean.shape))
-        # surrogate_mean = surrogate_mean.reshape(pred_std.shape)
-        for robot in range(N):
+
+        for robot in range(len(alive_robots)):
+
             location_ids = np.array(locationIdx[robot])
             locations = np.array(locationx[robot])
             if len(location_ids) != 0:
                 std_in_voronoi_region = (pred_var[location_ids[:, 0], location_ids[:, 1]])
                 idx_with_max_std = np.argmax(std_in_voronoi_region)        
                 if robot==0:
-                    sampling_goal[:,robot] = locations[idx_with_max_std] 
+                    sampling_goal[:,alive_robots[robot]] = locations[idx_with_max_std] 
                 else:   
                     # a quick fix for robots getting same position for sampling
                     # it can happen because they share same voronoi boundary
@@ -223,8 +221,8 @@ def executeIPP_py(scenario_number,N=6,resolution=0.1, number_of_iterations=20, s
                     # In case of similar positions, assign a larger negative value to that standard deviation and then recalculate the position
                     similar_goal = True
                     while similar_goal:
-                        sampling_goal[:,robot] = locations[idx_with_max_std] 
-                        similar_goal = np.any(np.all(sampling_goal[:,:robot] == (sampling_goal[:,robot]).reshape(2,1), axis=0))
+                        sampling_goal[:,alive_robots[robot]] = locations[idx_with_max_std] 
+                        similar_goal = np.any(np.all(sampling_goal[:,:alive_robots[robot]] == (sampling_goal[:,alive_robots[robot]]).reshape(2,1), axis=0))
                         if similar_goal==False:
                             break           
                         std_in_voronoi_region[idx_with_max_std] = -10000
@@ -238,28 +236,29 @@ def executeIPP_py(scenario_number,N=6,resolution=0.1, number_of_iterations=20, s
         print(centroid)
         # Eq 11 from [1]
         # Control law to find x_i dot : \dot{x}_i^(t) = (1 - gamma) * c_i^(t) + gamma * e_i^(t), for i in {1, ..., N}
-        # robotsPositions_diff = (centroid) - current_robotspositions[:2,:]
+        robotsPositions_diff = (sampling_goal) - current_robotspositions[:2,:]
         
 
-        for robot in range(N):
-            areaArray[iteration,robot] = area[robot]
-            dist_to_centroid[robot] = (math.sqrt((current_robotspositions[ 0,robot] - C_x[robot]) ** 2 + (current_robotspositions[1,robot] - C_y[robot]) ** 2))
-            dist_to_centroid[robot] =  round(dist_to_centroid[robot], 2)
-            centroid_dist_array[iteration,robot] = dist_to_centroid[robot]
+        for robot in range(len(alive_robots)):
+            areaArray[iteration,alive_robots[robot]] = area[robot]
+            dist_to_centroid[alive_robots[robot]] = (math.sqrt((current_robotspositions[ 0,alive_robots[robot]] - C_x[robot]) ** 2 + (current_robotspositions[1,alive_robots[robot]] - C_y[robot]) ** 2))
+            dist_to_centroid[alive_robots[robot]] =  round(dist_to_centroid[alive_robots[robot]], 2)
+            centroid_dist_array[iteration,alive_robots[robot]] = dist_to_centroid[alive_robots[robot]]
             # find goal for balancing both centroid and sampling 
             # using  X(t+1) = x(t) + \dot{x}_i
+            goal_for_centroid[:,alive_robots[robot]] = (current_robotspositions[:2,alive_robots[robot]] + np.round(robotsPositions_diff[:2,alive_robots[robot]],decimals=2))
             if iteration>0:
-                d = dist(positions_last_timeStep[0,robot], positions_last_timeStep[1,robot], (current_robotspositions[0,robot],current_robotspositions[1,robot]))
-                cumulative_distance[robot] = cumulative_distance[robot] + d
-                cumulative_dist_array[iteration,robot]=cumulative_distance[robot]
+                d = dist(positions_last_timeStep[0,alive_robots[robot]], positions_last_timeStep[1,alive_robots[robot]], (current_robotspositions[0,alive_robots[robot]],current_robotspositions[1,alive_robots[robot]]))
+                cumulative_distance[alive_robots[robot]] = cumulative_distance[alive_robots[robot]] + d
+                cumulative_dist_array[iteration,alive_robots[robot]]=cumulative_distance[alive_robots[robot]]
                  
-                energy_spent_meter[iteration,robot] = energy_depleted(current_robot_energy[robot],d,robot_alpha[robot],robot_beta[robot],time_step)
-                
-                cumulative_energy_array[iteration,robot] = energy_spent_meter[iteration,robot]
-                current_robot_energy[robot] = current_robot_energy[robot]  - energy_spent_meter[iteration,robot]
-                battery_levels_over_time[iteration,robot]=current_robot_energy[robot]
+                energy_spent_meter[iteration,alive_robots[robot]] = energy_depleted(current_robot_energy[alive_robots[robot]],d,robot_alpha[alive_robots[robot]],robot_beta[alive_robots[robot]],time_step)
+                cumulative_energy_array[iteration,alive_robots[robot]] = energy_spent_meter[iteration,alive_robots[robot]]
+                current_robot_energy[alive_robots[robot]] = current_robot_energy[alive_robots[robot]]  - energy_spent_meter[iteration,alive_robots[robot]]
+                battery_levels_over_time[iteration,alive_robots[robot]]=current_robot_energy[alive_robots[robot]]
             else:
-                battery_levels_over_time[iteration,robot]=current_robot_energy[robot]
+                battery_levels_over_time[iteration,alive_robots[robot]]=current_robot_energy[alive_robots[robot]]
+        # Equation: RMSE = sqrt(mean((y_true - y_pred)**2))
 
 
         rmse = np.sqrt(np.mean(np.square(Z_phi.flatten() - pred_mean.flatten())))
@@ -268,9 +267,7 @@ def executeIPP_py(scenario_number,N=6,resolution=0.1, number_of_iterations=20, s
         variance_metric = np.mean(pred_var.flatten())
         variance_array[iteration] = variance_metric
         positions_last_timeStep = copy.deepcopy(current_robotspositions)
-        # Currently the next positions of robots are calculated using sampling goal only - 
-        # based on max std in robot's current partition
-        # current_robotspositions = copy.deepcopy(centroid)
+
         current_robotspositions = copy.deepcopy(sampling_goal) 
 
         file_path = f"{exp_name}\\{exp_trail}"
@@ -283,15 +280,28 @@ def executeIPP_py(scenario_number,N=6,resolution=0.1, number_of_iterations=20, s
     
 
         plt.pause(1)
-    def plot_rmse(fig_rmse,iteration_array,rmse_array):
-        ax_rmse = fig_rmse.add_subplot()
-        ax_rmse.set_ylabel("RMSE")
-        ax_rmse.set_xlabel("Iterations")
-        rmse_plot = ax_rmse.plot(iteration_array,rmse_array, color="black")
-        return rmse_plot
+    cumulative_dist_array =  cumulative_dist_array[:iteration]
+    positions_array = positions_array[:iteration]
+    cumulative_energy_array = cumulative_energy_array[:iteration]
+    centroid_dist_array = centroid_dist_array[:iteration]
+    areaArray = areaArray[:iteration]
+    rmse_array = rmse_array[:iteration]
+    variance_array = variance_array[:iteration]
+    regret_array = regret_array[:iteration]
+    iteration_array = iteration_array[:iteration]
+    beta_val_array = beta_val_array[:iteration]
+    rt_array = rt_array[:iteration]
+    locational_cost = locational_cost[:iteration]
+    battery_levels_over_time = battery_levels_over_time[:iteration]
+    energy_spent_meter = energy_spent_meter[:iteration]
+    coeff_sampling = coeff_sampling[:iteration]
+    coeff_recharge = coeff_recharge[:iteration]
+    coeff_mean = coeff_mean[:iteration]
+    coeff_var = coeff_var[:iteration]
+    updated_weights_plot_values = updated_weights_plot[:iteration,:]
     if(save_fig_flag):
         # Fig: Area
-        updated_weights_plot_values = updated_weights_plot[:, :]
+        # updated_weights_plot_values = updated_weights_plot[:, :]
         fig_area = plt.figure()
         ax_area = fig_area.add_subplot()
         ax_area.set_ylabel("Area")

@@ -126,7 +126,7 @@ def density_function(x, y, means, variances):
     for i in range(num_distributions):
         covariance_matrix = generate_covariance_matrix(variances[i])
         result += gaussian_density(x, y, means[i], covariance_matrix)
-    return result*49
+    return result*500
 
 # Function to calculate density function value at a point (x, y) for a given Gaussian distribution
 def gaussian_density(x, y, mean, covariance_matrix):
@@ -134,13 +134,13 @@ def gaussian_density(x, y, mean, covariance_matrix):
     return rv.pdf([x, y])
 
 # plot mean and var using the given plot axes for pred_mean and pred_var
-def plot_mean_and_var(X,Y,mean_min,mean_max,pred_mean,pred_var,pred_mean_fig=None,pred_var_fig=None):
+def plot_mean_and_var(X,Y,pred_mean,pred_var,Z_phi,pred_mean_fig=None,pred_var_fig=None):
   
     # print(mean_min,mean_max)
     # print(f"max value in pred_mean:{np.max(pred_mean)} and min value {np.min(pred_mean)}")
     pred_mean_fig.clf()
     ax_2d_mean = pred_mean_fig.add_subplot()
-    contour_plot_mean = ax_2d_mean.pcolor(X, Y, pred_mean.reshape(X.shape[0],X.shape[1]), cmap='viridis',vmin = 0,vmax = 8)
+    contour_plot_mean = ax_2d_mean.pcolor(X, Y, pred_mean.reshape(X.shape[0],X.shape[1]), cmap='viridis',vmin = np.min(Z_phi),vmax = np.max(Z_phi))
 
     ax_2d_mean.set_title( 'predicted mean')
     ax_2d_mean.set_xlabel('X')

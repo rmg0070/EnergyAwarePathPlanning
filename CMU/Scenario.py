@@ -3,12 +3,13 @@ import numpy as np
 def get_scenario_params(scenario_name, N):
     # Initialize parameters
     initial_energy = np.full(N, 100.0)
-    initial_energy[1] = 60
-    initial_energy[3] = 60
-    robot_beta = np.array([0.5,0.5,0.5,0.5])
+    initial_energy[1] = 50
+    initial_energy[3] = 50
+    robot_beta = np.array([2.0,2.0,2.0,2.0])
+
     robot_alpha = np.array([0.1,0.1,0.1,0.1])
     exp_name = "temp"
-    exp_trail = "CMU"
+    exp_trail = "CMU4"
     # Adjust parameters based on scenario
     if scenario_name == '1':
         print(scenario_name)

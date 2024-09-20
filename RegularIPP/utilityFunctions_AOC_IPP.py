@@ -37,11 +37,13 @@ def partitionFinder(ax, robotsPositions, envSize_X, envSize_Y, resolution, densi
             for r in range(robotsPositions.shape[0]):    
                 distanceSq = (robotsPositions[r, 0] - x_pos) ** 2 + (robotsPositions[r, 1] - y_pos) ** 2
                 #distArray[r] = abs(math.sqrt(distanceSq))
-                distArray[r] = abs(math.sqrt(distanceSq))
-            minValue = np.min(distArray)
-            minIndices = np.where(distArray == minValue)[0]
-            for r in minIndices:
-                locations[r].append([x_pos, y_pos])
+                distArray[r] = math.sqrt(distanceSq)
+            minIndex = np.argmin(distArray)
+            locations[minIndex].append([x_pos, y_pos])
+            # minValue = np.min(distArray)
+            # minIndices = np.where(distArray == minValue)[0]
+            # for r in minIndices:
+            #     locations[r].append([x_pos, y_pos])
 
     # There is no-builtin library in python that supports good visulaization for voronoi
     # Therefore, using convex hull to draw the boundary of each partition
@@ -52,9 +54,10 @@ def partitionFinder(ax, robotsPositions, envSize_X, envSize_Y, resolution, densi
         if len(robotsLocation)!=0:
             hull = ConvexHull(robotsLocation)
             # Get the vertices of the convex hull
-            boundary_points = robotsLocation[hull.vertices]
-            # Extract x and y coordinates
-            x, y = boundary_points[:, 0], boundary_points[:, 1]
+            x, y = robotsLocation[hull.vertices, 0], robotsLocation[hull.vertices, 1]
+            # boundary_points = robotsLocation[hull.vertices]
+            # # Extract x and y coordinates
+            # x, y = boundary_points[:, 0], boundary_points[:, 1]
             hullHandle, =  ( ax.plot(x, y, marker='None', linestyle='-', color="black", markersize=6, linewidth =4))
             hull_figHandles.append(hullHandle)
         
@@ -125,7 +128,7 @@ def density_function(x, y, means, variances):
     for i in range(num_distributions):
         covariance_matrix = generate_covariance_matrix(variances[i])
         result += gaussian_density(x, y, means[i], covariance_matrix)
-    return result*49
+    return result*1000
 
 # Function to calculate density function value at a point (x, y) for a given Gaussian distribution
 def gaussian_density(x, y, mean, covariance_matrix):
@@ -133,13 +136,13 @@ def gaussian_density(x, y, mean, covariance_matrix):
     return rv.pdf([x, y])
 
 # plot mean and var using the given plot axes for pred_mean and pred_var
-def plot_mean_and_var(X,Y,mean_min,mean_max,pred_mean,pred_var,pred_mean_fig=None,pred_var_fig=None):
+def plot_mean_and_var(X,Y,pred_mean,pred_var,Z_phi,pred_mean_fig=None,pred_var_fig=None):
   
     # print(mean_min,mean_max)
     # print(f"max value in pred_mean:{np.max(pred_mean)} and min value {np.min(pred_mean)}")
     pred_mean_fig.clf()
     ax_2d_mean = pred_mean_fig.add_subplot()
-    contour_plot_mean = ax_2d_mean.pcolor(X, Y, pred_mean.reshape(X.shape[0],X.shape[1]), cmap='viridis',vmin = 0,vmax = 8)
+    contour_plot_mean = ax_2d_mean.pcolor(X, Y, pred_mean.reshape(X.shape[0],X.shape[1]), cmap='viridis',vmin = np.min(Z_phi),vmax = np.max(Z_phi))
 
     ax_2d_mean.set_title( 'predicted mean')
     ax_2d_mean.set_xlabel('X')
@@ -153,8 +156,8 @@ def plot_mean_and_var(X,Y,mean_min,mean_max,pred_mean,pred_var,pred_mean_fig=Non
     ax_2d_var.set_title( 'predicted std')
     ax_2d_var.set_xlabel('X')
     ax_2d_var.set_ylabel('Y')
+    ax_2d_var.grid(False)
     plt.colorbar(contour_plot_var, ax= ax_2d_var)
-
 
 def energy_depleted(current_energy,dist_travelled,robo_alpha,robo_beta,timestep):
 

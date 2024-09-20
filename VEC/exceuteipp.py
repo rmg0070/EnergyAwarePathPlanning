@@ -24,21 +24,20 @@ def executeIPP_py(scenario_number,N=6,resolution=0.1, number_of_iterations=20, s
     distance_to_centroid_threshold= -0.1
     file_path = ""
     ROBOT_COLOR = {0: "red", 1: "green", 2: "blue", 3:"black",4:"grey",5:"orange"}
-    x_min, x_max = -10, 10
-    y_min, y_max = -10, 10    
+    x_min, x_max = 0, 20
+    y_min, y_max = 0, 20    
 
     robot_alpha,robot_beta,initial_robots_energy,exp_name,exp_trail = get_scenario_params(scenario_number,N)
     file_path = f"{exp_name}\\{exp_trail}"
     # generate random initial values
-    current_robotspositions =  np.random.uniform(x_min, x_max, size=(2, N))
+    # current_robotspositions =  np.random.uniform(x_min, x_max, size=(2, N))
     Model = "MiGp"
-
-    current_robotspositions = np.array([[-0.71973804, -4.85164722, -2.85176015,  1.99403118],
-        [ 3.11841394, -4.55468264, -1.32746517,  4.42244048]])
-    # current_robotspositions =np.array([[2, -2, 5, -5], [-4, 4, -2, 2]])
-    # current_robotspositions = np.array([[1, -1, 4, -4], [3, -3, 2, -2]])
-
-
+    current_robotspositions = np.array([
+        [19.71047901, 3.34092571],
+        [14.71047901, 14.34092571],
+        [2.33815788, 3.87953727],
+        [5, 12]
+    ]).T
     # to show interactive plotting
     current_robot_energy = initial_robots_energy
     max_energy = np.max(current_robot_energy)
@@ -80,7 +79,9 @@ def executeIPP_py(scenario_number,N=6,resolution=0.1, number_of_iterations=20, s
     # Number of Gaussian distributions
     num_distributions = 9
     # Variances for all distributions
-    variances = np.ones(num_distributions) * 2.0 # Adjusted variance for visibility
+    # variances = np.ones(num_distributions) * 2.0 # Adjusted variance for visibility
+    variances = np.load("C:\\Users\\LibraryUser\\Desktop\\EnergyAwarePathPlanning\\variances.npy")
+
     # Generate random means for both density functions
     # means_phi = generate_random_means(num_distributions, (x_min,x_max))
     means_phi =  np.load("C:\\Users\\LibraryUser\\Desktop\\EnergyAwarePathPlanning\\means_phi.npy")
@@ -90,17 +91,7 @@ def executeIPP_py(scenario_number,N=6,resolution=0.1, number_of_iterations=20, s
     # np.save(os.path.join(file_path, f"means_phi.npy"),means_phi)
 
     # Create a grid of points for plotting
-    x_vals = np.arange(x_min, x_max + resolution, resolution) 
-    y_vals = np.arange(y_min, y_max + resolution, resolution)
-    X = np.zeros((len(x_vals), len(y_vals)))
-    Y = np.zeros((len(x_vals), len(y_vals)))
-    points_grid_x = np.ones((len(x_vals), len(y_vals)))
-    # Fill X and Y arrays using for loops
-    for i, x in enumerate(x_vals):
-        for j, y in enumerate(y_vals):
-            # print(x,y,i,j)
-            X[i, j] = x
-            Y[i, j] = y
+    
     # Z_phi = np.vectorize(lambda x, y: density_function(x, y, means_phi, variances))(X, Y)
     # np.save(os.path.join(file_path, f"Z_phi.npy"),Z_phi)
     # Z_phi = np.load("C:\\Users\\LibraryUser\\Desktop\\RegularIPP\\Z_phi.npy")
@@ -119,17 +110,8 @@ def executeIPP_py(scenario_number,N=6,resolution=0.1, number_of_iterations=20, s
     contour_plot_mean = main_axes.contourf(X, Y, Z_phi.reshape(X.shape[0],X.shape[1]), cmap='viridis')
     plt.colorbar(contour_plot_mean, ax= main_axes)
     train_X = np.transpose(current_robotspositions)
-    Z_phi_current_pos = np.vectorize(lambda x, y: density_function(x, y, means_phi, variances))(current_robotspositions[0,:], current_robotspositions[1,:])
+    Z_phi_current_pos = np.vectorize(lambda x, y: density_function(x, y, means_phi, variances))(current_robotspositions[0,:], current_robotspositions[1,:])+np.random.uniform(-2,2,size=N)
     train_Y = Z_phi_current_pos.reshape(train_X.shape[0],1)
-    # /\print(np.var(Z_phi))
-    # model = GP(sigma_f=np.var(Z_phi))
-
-    # model = MixtureGaussianProcess(4,modeling_gps,gating_gps,0.03,200)
-
-    # model.train(train_X,train_Y)
-    # model.AddSample(train_X,train_Y)
-    # pred_mean, pred_var = model.predict(test_X)
-    # pred_mean, pred_var = model.Predict(test_X)
     if Model == "MixGp":
         model = MixtureGaussianProcess(4,modeling_gps,gating_gps,0.03,200)
         # model = MixtureGaussianProcess(4,[GP(sigma_f=np.var(Z_phi)) for i in range(4)],[GP(sigma_f=np.var(Z_phi)) for i in range(4)])
@@ -187,7 +169,7 @@ def executeIPP_py(scenario_number,N=6,resolution=0.1, number_of_iterations=20, s
         # 
         C_x, C_y , cost, area, global_hull_figHandles, global_hull_textHandles,locationIdx,locationx = partitionFinder(main_axes,np.transpose(current_robotspositions[:2,:N]), [x_min,x_max], [y_min,y_max], resolution,surrogate_mean.reshape(Z_phi.shape)) 
         train_X = np.transpose(current_robotspositions)
-        Z_phi_current_pos = np.vectorize(lambda x, y: density_function(x, y, means_phi, variances))(current_robotspositions[0,:], current_robotspositions[1,:])
+        Z_phi_current_pos = np.vectorize(lambda x, y: density_function(x, y, means_phi, variances))(current_robotspositions[0,:], current_robotspositions[1,:])+np.random.uniform(-2,2,size=N)
         # Beta for Eq 9 - surrogate_mean from [1]
         beta_val = 2*math.log( discretization/(6*0.7))
         beta_val_array[iteration] = beta_val
@@ -208,7 +190,7 @@ def executeIPP_py(scenario_number,N=6,resolution=0.1, number_of_iterations=20, s
                 pred_mean, pred_var = model.predict(test_X)
         pred_var = pred_var.reshape(X.shape[0],X.shape[1])
         pred_std = np.sqrt(pred_var)
-        plot_mean_and_var(X,Y,means_min,means_max,pred_mean,pred_std.reshape(pred_mean.shape),pred_mean_fig=pred_mean_fig,pred_var_fig=pred_var_fig)
+        plot_mean_and_var(X,Y,pred_mean,pred_std.reshape(pred_mean.shape),Z_phi,pred_mean_fig=pred_mean_fig,pred_var_fig=pred_var_fig)
         # Eq 9 from paper [1]
         # phi^(t)(q) = mu^(t-1)(q) - sqrt(beta^(t)) * sigma^(t-1)(q), for all q in D
         surrogate_mean = copy.deepcopy(pred_mean) - (math.sqrt(beta_val)*pred_std.reshape(pred_mean.shape))

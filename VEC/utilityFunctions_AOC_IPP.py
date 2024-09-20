@@ -7,6 +7,7 @@ import matplotlib.pyplot as plt
 from mpl_toolkits.mplot3d import Axes3D
 from matplotlib import cm
 from scipy.stats import multivariate_normal
+from shapely.geometry import Point,Polygon
 ##########################################################################
 # Paper ref:
 #[1] Maria Santos, Udari Madhushani, Alessia Benevento,and Naomi Ehrich Leonard. Multi-robot learning and coverage of unknown spatial fields.
@@ -32,6 +33,7 @@ def partitionFinder(ax, robotsPositions, envSize_X, envSize_Y, resolution, densi
     # res = 0.02
     x_global_values = np.arange(envSize_X[0], envSize_X[1] + res, res) 
     y_global_values = np.arange(envSize_Y[0], envSize_Y[1] + res, res)
+    ploygonList = [[] for _ in range(robotsPositions.shape[0])]
     for i, x_pos in enumerate(x_global_values):
         for j, y_pos in enumerate(y_global_values):
             for r in range(robotsPositions.shape[0]):    
@@ -57,6 +59,7 @@ def partitionFinder(ax, robotsPositions, envSize_X, envSize_Y, resolution, densi
             x, y = boundary_points[:, 0], boundary_points[:, 1]
             hullHandle, =  ( ax.plot(x, y, marker='None', linestyle='-', color="black", markersize=6, linewidth =4))
             hull_figHandles.append(hullHandle)
+            ploygonList[r] = Polygon(boundary_points)
         
     # for centroid calculation
     # centroid calculation can be done using lower resolution
@@ -101,12 +104,27 @@ def partitionFinder(ax, robotsPositions, envSize_X, envSize_Y, resolution, densi
             positionDiffSq = (locationInRobotRegion[pos, 0] - currentrobotLoc[0]) ** 2 + (locationInRobotRegion[pos, 1] - currentrobotLoc[1]) ** 2  
             # We are not integrating so this implementation includes resolution as well
             locationalCost += dens *resolution* (positionDiffSq - 1) 
+    
+    
         if(Mass_r!=0):
+            loc = np.array(locations[r])
             Cx_r /= Mass_r
             Cy_r /= Mass_r
             C_x[r] = Cx_r
             C_y[r] = Cy_r
             Mass[r] = Mass_r
+            p1 = Point(C_x[r],C_y[r])
+            if p1.within(ploygonList[r]):
+                pass
+            else:            
+                idx_with_max_mean = np.argmax(robotDensity[r])  
+                # C_x[r] = loc[idx_with_max_mean,0]
+                # C_y[r] = loc[idx_with_max_mean,1]
+                #C_x[r] = C_x[r]
+                #C_y[r] = C_y[r]
+                #print(f"r:{r}, outside Cx:{C_x[r]}, Cy:{C_y[r]}, inside Cx:{robotsPositions[r,0]}, Cy:{robotsPositions[r,1]}")
+                C_x[r] = robotsPositions[r,0]
+                C_y[r] = robotsPositions[r,1]
     return C_x, C_y, locationalCost, Mass,hull_figHandles,text_handles,locationsIdx,locations
     
     
@@ -125,7 +143,7 @@ def density_function(x, y, means, variances):
     for i in range(num_distributions):
         covariance_matrix = generate_covariance_matrix(variances[i])
         result += gaussian_density(x, y, means[i], covariance_matrix)
-    return result*49
+    return result*500
 
 # Function to calculate density function value at a point (x, y) for a given Gaussian distribution
 def gaussian_density(x, y, mean, covariance_matrix):
@@ -133,13 +151,13 @@ def gaussian_density(x, y, mean, covariance_matrix):
     return rv.pdf([x, y])
 
 # plot mean and var using the given plot axes for pred_mean and pred_var
-def plot_mean_and_var(X,Y,mean_min,mean_max,pred_mean,pred_var,pred_mean_fig=None,pred_var_fig=None):
+def plot_mean_and_var(X,Y,pred_mean,pred_var,Z_phi,pred_mean_fig=None,pred_var_fig=None):
   
     # print(mean_min,mean_max)
     # print(f"max value in pred_mean:{np.max(pred_mean)} and min value {np.min(pred_mean)}")
     pred_mean_fig.clf()
     ax_2d_mean = pred_mean_fig.add_subplot()
-    contour_plot_mean = ax_2d_mean.pcolor(X, Y, pred_mean.reshape(X.shape[0],X.shape[1]), cmap='viridis',vmin = 0,vmax = 8)
+    contour_plot_mean = ax_2d_mean.pcolor(X, Y, pred_mean.reshape(X.shape[0],X.shape[1]), cmap='viridis',vmin = np.min(Z_phi),vmax = np.max(Z_phi))
 
     ax_2d_mean.set_title( 'predicted mean')
     ax_2d_mean.set_xlabel('X')
